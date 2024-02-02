@@ -9,3 +9,4 @@ Repo for experiments with Flask-RESTX library.
 ## Repo Contents
 
 - Minimal Flask-RESTX API: [minimal.py](minimal.py)
+- Resourceful Routing Example: [resourceful.py](resourceful.py)

@@ -5,7 +5,7 @@ curl http://127.0.0.1:5000/hello
 """
 
 from flask import Flask
-from flask_restx import Resource, Api
+from flask_restx import Api, Resource
 
 app = Flask(__name__)
 api = Api(app)
