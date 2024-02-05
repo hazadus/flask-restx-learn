@@ -1,6 +1,8 @@
 import os
 import sqlite3
 from typing import Optional
+from dataclasses import dataclass
+from marshmallow import Schema, fields
 
 INITIAL_AUTHORS = [
     {"id": 1, "last_name": "Romalho", "first_name": "Luciano", "middle_name": ""},
@@ -17,6 +19,34 @@ INITIAL_BOOKS = [
     },
 ]
 DATABASE_FILE = "books.db"
+
+
+@dataclass
+class Author:
+    id: int
+    last_name: str
+    first_name: str
+    middle_name: str
+
+
+@dataclass
+class Book:
+    id: int
+    title: str
+    author: Author
+
+
+class AuthorSchema(Schema):
+    id = fields.Int()
+    last_name = fields.Str()
+    first_name = fields.Str()
+    middle_name = fields.Str()
+
+
+class BookSchema(Schema):
+    id = fields.Int()
+    title = fields.Str()
+    author = fields.Nested(AuthorSchema)
 
 
 def reset_db():
@@ -86,7 +116,7 @@ def init_db() -> None:
             )
 
 
-def get_all_books():
+def get_all_books() -> list[Book]:
     with sqlite3.connect(DATABASE_FILE) as conn:
         cursor: sqlite3.Cursor = conn.cursor()
         cursor.execute(
@@ -96,4 +126,31 @@ def get_all_books():
             JOIN authors ON  books.author_id = authors.id
             """
         )
-        return [(*row,) for row in cursor.fetchall()]
+        results = []
+        for row in cursor.fetchall():
+            (
+                book_id,
+                book_title,
+                author_id,
+                author_last_name,
+                author_first_name,
+                author_middle_name,
+            ) = row
+            results.append(
+                Book(
+                    id=book_id,
+                    title=book_title,
+                    author=Author(
+                        id=author_id,
+                        last_name=author_last_name,
+                        first_name=author_first_name,
+                        middle_name=author_middle_name,
+                    ),
+                )
+            )
+        return results
+
+
+def get_all_books_json() -> list:
+    books = get_all_books()
+    return BookSchema().dump(books, many=True)
