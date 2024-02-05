@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource
-from core.models import get_all_books_json
+
+from core.services import get_all_books_json
 
 api = Namespace("books", description="Books related operations")
 
