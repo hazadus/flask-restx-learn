@@ -8,4 +8,4 @@ api = Api(
     description="Simple books API built to test Flask-RESTX.",
 )
 
-api.add_namespace(api_books, path="/books")
+api.add_namespace(api_books, path="/api/books")
