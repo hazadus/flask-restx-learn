@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource
+from core.models import get_all_books
 
 api = Namespace("books", description="Books related operations")
 
@@ -8,4 +9,4 @@ class BookList(Resource):
     @api.doc("list_books")
     def get(self):
         """List all books"""
-        return [{"id": 1, "title": "Fluent Python"}]
+        return get_all_books()

@@ -51,7 +51,7 @@ def init_db() -> None:
                 """
                 CREATE TABLE `books` (
                     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                    author_id INTEGER,
+                    author_id INTEGER NOT NULL ,
                     title TEXT,
                     FOREIGN KEY (author_id)
                         REFERENCES `authors` (id)
@@ -84,3 +84,16 @@ def init_db() -> None:
                     for item in INITIAL_BOOKS
                 ],
             )
+
+
+def get_all_books():
+    with sqlite3.connect(DATABASE_FILE) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT books.id, books.title, authors.id, authors.last_name, authors.first_name, authors.middle_name
+            FROM books
+            JOIN authors ON  books.author_id = authors.id
+            """
+        )
+        return [(*row,) for row in cursor.fetchall()]
