@@ -10,6 +10,7 @@
 
 ## `/authors/`
 
+- [X] `GET /api/authors/` — просмотр всех авторов.
 - [ ] `DELETE /api/authors/{id}` — удаление автора вместе со всеми его книгами.
 - [ ] `POST /api/authors/` — создание автора.
 - [ ] `PATCH /api/authors/` — частичное изменение автора.
