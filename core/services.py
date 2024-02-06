@@ -45,6 +45,11 @@ def get_all_books_json() -> list:
 
 
 def get_book_by_id(book_id: int) -> Book:
+    """Return Book with `book_id`
+    :param book_id: id of the book to return
+    :return: Book with `book_id`
+    :raises Exception: if book with `book_id` was not found
+    """
     with sqlite3.connect(DATABASE_FILE_PATH) as conn:
         cursor: sqlite3.Cursor = conn.cursor()
         cursor.execute(
@@ -84,3 +89,20 @@ def get_book_by_id(book_id: int) -> Book:
 def get_book_by_id_json(book_id: int) -> str:
     book = get_book_by_id(book_id)
     return BookSchema().dump(book)
+
+
+def delete_book_by_id(book_id: int) -> None:
+    """Delete book by its id.
+    :param book_id: id of the book to delete
+    :raises Exception: if nothing was deleted
+    """
+    with sqlite3.connect(DATABASE_FILE_PATH) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        result = cursor.execute(
+            """
+            DELETE FROM books WHERE books.id = $1
+            """,
+            [book_id],
+        )
+        if not result.rowcount:
+            raise Exception(f"Nothing was deleted. Wrong {book_id=}?")
