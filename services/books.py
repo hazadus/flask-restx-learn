@@ -44,7 +44,7 @@ def get_all_books_json() -> list:
     return BookSchema().dump(books, many=True)
 
 
-def get_book_by_id(book_id: int) -> Book:
+def get_book(book_id: int) -> Book:
     """Return Book with `book_id`
     :param book_id: id of the book to return
     :return: Book with `book_id`
@@ -86,12 +86,12 @@ def get_book_by_id(book_id: int) -> Book:
         )
 
 
-def get_book_by_id_json(book_id: int) -> str:
-    book = get_book_by_id(book_id)
+def get_book_json(book_id: int) -> str:
+    book = get_book(book_id)
     return BookSchema().dump(book)
 
 
-def delete_book_by_id(book_id: int) -> None:
+def delete_book(book_id: int) -> None:
     """Delete book by its id.
     :param book_id: id of the book to delete
     :raises Exception: if nothing was deleted
