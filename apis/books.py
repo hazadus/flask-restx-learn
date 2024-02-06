@@ -2,7 +2,11 @@ from http import HTTPStatus
 
 from flask_restx import Namespace, Resource
 
-from core.services import get_all_books_json, get_book_by_id_json, delete_book_by_id
+from core.services.books import (
+    delete_book_by_id,
+    get_all_books_json,
+    get_book_by_id_json,
+)
 
 api = Namespace("books", description="Books related operations")
 
