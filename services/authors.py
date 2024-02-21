@@ -9,7 +9,7 @@ def get_all_authors() -> list[Author]:
         cursor: sqlite3.Cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT id, last_name, first_name, middle_name
+            SELECT last_name, first_name, id, middle_name
             FROM authors
             """
         )
@@ -39,7 +39,7 @@ def delete_author(author_id: int) -> None:
 
 
 def get_author(author_id: int) -> Author:
-    """Return Author with `author_id`
+    """Return Author with `author_id`.
     :param author_id: id of the author to return
     :return: Author with `author_id`
     :raises Exception: if author with `author_id` was not found
@@ -48,7 +48,7 @@ def get_author(author_id: int) -> Author:
         cursor: sqlite3.Cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT id, last_name, first_name, middle_name
+            SELECT last_name, first_name, id, middle_name
             FROM authors
             WHERE authors.id = $1
             """,
@@ -64,4 +64,31 @@ def get_author(author_id: int) -> Author:
 
 def get_author_json(author_id: int) -> dict:
     author = get_author(author_id)
+    return AuthorSchema().dump(author)
+
+
+def create_author_from_payload(payload) -> Author:
+    """Create new author in the database and return it as `Author` instance.
+    :param payload: POST request payload with necessary author data
+    :return: new `Author` instance
+    :raises Exception: `AuthorSchema().load()` could raise exception if validation fails
+    """
+    author: Author = AuthorSchema().load(data=payload)
+
+    with sqlite3.connect(DATABASE_FILE_PATH) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO `authors`
+            (last_name, first_name, middle_name) VALUES (?, ?, ?)
+            """,
+            [author.last_name, author.first_name, author.middle_name],
+        )
+
+    author.id = cursor.lastrowid
+    return author
+
+
+def create_author_from_payload_json(payload) -> dict:
+    author = create_author_from_payload(payload)
     return AuthorSchema().dump(author)

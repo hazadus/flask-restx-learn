@@ -2,7 +2,12 @@ from http import HTTPStatus
 
 from flask_restx import Namespace, Resource
 
-from services.authors import delete_author, get_all_authors_json, get_author_json
+from services.authors import (
+    create_author_from_payload_json,
+    delete_author,
+    get_all_authors_json,
+    get_author_json,
+)
 from services.books import get_books_by_author_json
 
 api = Namespace("authors", description="Authors related operations")
@@ -14,6 +19,14 @@ class AuthorList(Resource):
     def get(self):
         """List all authors"""
         return get_all_authors_json()
+
+    @api.doc("create_author")
+    def post(self):
+        """Create new author, and return its data"""
+        try:
+            return create_author_from_payload_json(api.payload), HTTPStatus.CREATED
+        except Exception as ex:
+            return api.abort(HTTPStatus.BAD_REQUEST, ex)
 
 
 @api.route("/<author_id>")

@@ -5,6 +5,7 @@ Repo for experiments with Flask-RESTX library.
 ## References
 
 - [Flask-RESTX Quick Start](https://flask-restx.readthedocs.io/en/latest/quickstart.html)
+- [marshmallow docs](https://marshmallow.readthedocs.io/en/stable/)
 
 ## Repo Contents
 
