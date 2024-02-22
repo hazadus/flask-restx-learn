@@ -8,7 +8,10 @@ from services.books import (
     get_book_json,
     update_book_from_payload_json,
 )
-from services.common import create_book_and_author_from_payload_json
+from services.common import (
+    create_book_and_author_from_payload_json,
+    update_or_create_book_from_payload_json,
+)
 
 api = Namespace("books", description="Books related operations")
 
@@ -48,6 +51,19 @@ class Book(Resource):
         """Update book data"""
         try:
             return update_book_from_payload_json(book_id, api.payload)
+        except Exception as ex:
+            return api.abort(HTTPStatus.BAD_REQUEST, ex)
+
+    @api.doc("update_or_create_book")
+    def put(self, book_id):
+        """Update or create the book
+        Return 200 if updated, 201 if the book was created
+        """
+        try:
+            json, status_code = update_or_create_book_from_payload_json(
+                book_id, api.payload
+            )
+            return json, status_code
         except Exception as ex:
             return api.abort(HTTPStatus.BAD_REQUEST, ex)
 

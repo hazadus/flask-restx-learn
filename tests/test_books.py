@@ -144,3 +144,71 @@ class TestBooksEndpoint(unittest.TestCase):
 
         self.assertEqual(HTTPStatus.OK, response.status_code)
         self.assertIn(new_book_title, response.text)
+
+    def test_put_book_creates_new_book(self):
+        new_book_id = 100500
+        book_title = "Brand New Book"
+        author_last_name = "Newest"
+        author_first_name = "News"
+
+        response = self.app.put(
+            self.base_url + f"/{new_book_id}",
+            json={
+                "title": book_title,
+                "author": {
+                    "last_name": author_last_name,
+                    "first_name": author_first_name,
+                },
+            },
+        )
+        self.assertEqual(HTTPStatus.CREATED, response.status_code)
+        self.assertIn(book_title, response.text)
+        self.assertIn(author_last_name, response.text)
+        self.assertIn(author_first_name, response.text)
+
+    def test_put_book_updates_existing_book_title_and_author(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        new_book_title = "Updated Book Title"
+        new_author_id = INITIAL_BOOKS[0]["author_id"] + 1
+
+        response = self.app.put(
+            self.base_url + f"/{book_id}",
+            json={
+                "title": new_book_title,
+                "author": {
+                    "id": new_author_id,
+                },
+            },
+        )
+
+        self.assertEqual(HTTPStatus.OK, response.status_code)
+        self.assertIn(new_book_title, response.text)
+
+    def test_put_book_updates_existing_book_title(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        new_book_title = "Updated Book Title"
+
+        response = self.app.put(
+            self.base_url + f"/{book_id}",
+            json={
+                "title": new_book_title,
+            },
+        )
+
+        self.assertEqual(HTTPStatus.OK, response.status_code)
+        self.assertIn(new_book_title, response.text)
+
+    def test_put_book_updates_author(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        new_author_id = INITIAL_BOOKS[0]["author_id"] + 1
+
+        response = self.app.put(
+            self.base_url + f"/{book_id}",
+            json={
+                "author": {
+                    "id": new_author_id,
+                }
+            },
+        )
+
+        self.assertEqual(HTTPStatus.OK, response.status_code)

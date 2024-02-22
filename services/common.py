@@ -1,6 +1,6 @@
 from core.models import Book, BookSchema
 from services.authors import create_author
-from services.books import create_book
+from services.books import create_book, get_book, update_book
 
 
 def create_book_and_author_from_payload(payload) -> Book:
@@ -45,3 +45,34 @@ def create_book_and_author_from_payload_json(payload) -> dict:
     """
     book = create_book_and_author_from_payload(payload)
     return BookSchema().dump(book)
+
+
+def update_or_create_book_from_payload_json(book_id: int, payload) -> (dict, int):
+    """
+    Update existing or create new book.
+    :param book_id: book to update; if there's no book with such ID, new book will be created (ID will be assigned by database).
+    :param payload: title field is required to update; title, author id | first + last name to create.
+    :return: tuple of JSON-serializable updated book data and HTTP status code (200 or 201)
+    """
+    book_data = BookSchema().load(
+        payload,
+        partial={
+            "id",
+            "author.id",
+            "author.last_name",
+            "author.first_name",
+            "author.middle_name",
+        },
+    )
+
+    try:
+        book = get_book(book_id)
+        # Book exists - update it
+        author = book_data.get("author", None)
+        author_id = author.id if author else None
+        book = update_book(book_id, title=book_data.get("title"), author_id=author_id)
+        return BookSchema().dump(book), 200
+    except:
+        # Book does not exist - create it
+        book = create_book_and_author_from_payload(payload)
+        return BookSchema().dump(book), 201
