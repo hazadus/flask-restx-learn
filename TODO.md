@@ -4,7 +4,7 @@
 
 - [X] `GET /api/books/{id}` — получение информации о книге.
 - [X] `POST /api/books/` — создание книги с ID существующего автора.
-- [ ] `POST /api/books/` + автор — создание книги с именем и фамилией автора создаёт книгу и автора.
+- [X] `POST /api/books/` + автор — создание книги с именем и фамилией автора создаёт книгу и автора.
 - [ ] `PUT /api/books/{id}` — изменение или создание книги.
 - [ ] `PATCH /api/books/{id}` — частичное изменение книги.
 - [X] `DELETE /api/books/{id}` — удаление книги.
@@ -16,7 +16,7 @@
 - [X] `GET /api/authors/{id}` — просмотр всех книг автора.
 - [X] `POST /api/authors/` — создание автора.
 - [X] `DELETE /api/authors/{id}` — удаление автора вместе со всеми его книгами.
-- [ ] Возможность создать автора при добавлении книги.
+- [X] Возможность создать автора при добавлении книги.
 - [X] При удалении автора удаляются все его книги.
 
 ## Общее
@@ -44,4 +44,9 @@ curl --request POST \
     --url http://127.0.0.1:5000/api/books/ \
     --header 'Content-Type: application/json' \
     --data '{"title": "The New Book", "author": {"id": 1}}' | jq
+
+curl --request POST \
+    --url http://127.0.0.1:5000/api/books/ \
+    --header 'Content-Type: application/json' \
+    --data '{"title": "The New Book", "author": {"last_name": "Ivanov", "first_name": "Ivan"}}' | jq
 ```

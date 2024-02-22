@@ -67,6 +67,27 @@ def get_author_json(author_id: int) -> dict:
     return AuthorSchema().dump(author)
 
 
+def create_author(
+    last_name: str, first_name: str, middle_name: str | None = None
+) -> Author:
+    with sqlite3.connect(DATABASE_FILE_PATH) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO `authors`
+            (last_name, first_name, middle_name) VALUES (?, ?, ?)
+            """,
+            [last_name, first_name, middle_name],
+        )
+
+    return Author(
+        id=cursor.lastrowid,
+        last_name=last_name,
+        first_name=first_name,
+        middle_name=middle_name,
+    )
+
+
 def create_author_from_payload(payload) -> Author:
     """Create new author in the database and return it as `Author` instance.
     :param payload: POST request payload with necessary author data
@@ -75,18 +96,11 @@ def create_author_from_payload(payload) -> Author:
     """
     author: Author = AuthorSchema().load(data=payload)
 
-    with sqlite3.connect(DATABASE_FILE_PATH) as conn:
-        cursor: sqlite3.Cursor = conn.cursor()
-        cursor.execute(
-            """
-            INSERT INTO `authors`
-            (last_name, first_name, middle_name) VALUES (?, ?, ?)
-            """,
-            [author.last_name, author.first_name, author.middle_name],
-        )
-
-    author.id = cursor.lastrowid
-    return author
+    return create_author(
+        last_name=author.last_name,
+        first_name=author.first_name,
+        middle_name=author.middle_name,
+    )
 
 
 def create_author_from_payload_json(payload) -> dict:

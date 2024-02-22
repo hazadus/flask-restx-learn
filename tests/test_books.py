@@ -55,3 +55,45 @@ class TestBooksEndpoint(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+    def test_post_book_creates_new_author(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        book_title = "The New Book"
+        author_last_name = "Ivanov"
+        author_first_name = "Ivan"
+
+        response = self.app.post(
+            self.base_url + "/",
+            json={
+                "title": book_title,
+                "author": {
+                    "last_name": author_last_name,
+                    "first_name": author_first_name,
+                },
+            },
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertIn(book_title, response.text)
+        self.assertIn(author_last_name, response.text)
+        self.assertIn(author_first_name, response.text)
+
+    def test_post_book_fails_create_new_author_with_short_name(self):
+        """Ensure that author with len(last_name) < 3 and len(first_name) < 3 won't be created"""
+        book_id = INITIAL_BOOKS[0]["id"]
+        book_title = "The New Book"
+        author_last_name = "I"
+        author_first_name = "I"
+
+        response = self.app.post(
+            self.base_url + "/",
+            json={
+                "title": book_title,
+                "author": {
+                    "last_name": author_last_name,
+                    "first_name": author_first_name,
+                },
+            },
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
