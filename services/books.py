@@ -133,6 +133,26 @@ def get_book_json(book_id: int) -> str:
     return BookSchema().dump(book)
 
 
+def create_book(title: str, author_id: int) -> Book:
+    new_book_id = None
+
+    with sqlite3.connect(DATABASE_FILE_PATH) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        result = cursor.execute(
+            """
+            INSERT INTO `books`
+            (author_id, title) VALUES (?, ?)
+            """,
+            [author_id, title],
+        )
+        if not result.rowcount:
+            raise Exception("Book was not created.")
+
+        new_book_id = result.lastrowid
+
+    return get_book(book_id=new_book_id)
+
+
 def delete_book(book_id: int) -> None:
     """Delete book by its id.
     :param book_id: id of the book to delete

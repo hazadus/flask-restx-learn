@@ -27,6 +27,8 @@ class AuthorSchema(Schema):
 
     @post_load
     def make_author(self, data, **kwargs):
+        data["last_name"] = data.get("last_name", "")
+        data["first_name"] = data.get("first_name", "")
         return Author(**data)
 
 

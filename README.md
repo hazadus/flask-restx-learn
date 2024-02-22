@@ -6,6 +6,8 @@ Repo for experiments with Flask-RESTX library.
 
 - [Flask-RESTX Quick Start](https://flask-restx.readthedocs.io/en/latest/quickstart.html)
 - [marshmallow docs](https://marshmallow.readthedocs.io/en/stable/)
+  - [Partial loading](https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading)
+  - [Handling unknown fields](https://marshmallow.readthedocs.io/en/stable/quickstart.html#handling-unknown-fields)
 
 ## Repo Contents
 

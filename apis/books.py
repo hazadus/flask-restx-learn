@@ -3,6 +3,7 @@ from http import HTTPStatus
 from flask_restx import Namespace, Resource
 
 from services.books import delete_book, get_all_books_json, get_book_json
+from services.common import create_book_and_author_from_payload_json
 
 api = Namespace("books", description="Books related operations")
 
@@ -13,6 +14,17 @@ class BookList(Resource):
     def get(self):
         """List all books"""
         return get_all_books_json()
+
+    @api.doc("create_book")
+    def post(self):
+        """Create new book (and author if needed), and return its data"""
+        try:
+            return (
+                create_book_and_author_from_payload_json(api.payload),
+                HTTPStatus.CREATED,
+            )
+        except Exception as ex:
+            return api.abort(HTTPStatus.BAD_REQUEST, ex)
 
 
 @api.route("/<book_id>")
