@@ -153,6 +153,61 @@ def create_book(title: str, author_id: int) -> Book:
     return get_book(book_id=new_book_id)
 
 
+def update_book(
+    book_id: int, title: str | None = None, author_id: int | None = None
+) -> Book:
+    """
+    Update book title, author ID, or both.
+    :param book_id: book to update
+    :param title: new book title to set
+    :param author_id: new author ID to set
+    :return: updated `Book` instance
+    """
+    book = get_book(book_id)
+
+    new_title = title if title is not None else book.title
+    new_author_id = author_id if author_id is not None else book.author.id
+
+    with sqlite3.connect(DATABASE_FILE_PATH) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        result = cursor.execute(
+            """
+            UPDATE `books`
+            SET `author_id` = ?, `title` = ?
+            WHERE `id` = ?
+            """,
+            [new_author_id, new_title, book_id],
+        )
+        if not result.rowcount:
+            raise Exception("Book was not updated.")
+
+    book.title = new_title
+    book.author.id = new_author_id
+
+    return book
+
+
+def update_book_from_payload_json(book_id: int, payload) -> dict:
+    """
+    Update book title, author ID, or both.
+    :param book_id: book to update
+    :param payload: example - `{"title": "New title", "author": {"id": 1}}`.
+    :return: JSON-serializable updated book data
+    """
+    book = BookSchema().load(payload, partial=True)
+    author_id = None
+
+    if author := book.get("author", None):
+        author_id = author.id
+
+    updated_book = update_book(
+        book_id,
+        title=book.get("title", None),
+        author_id=author_id,
+    )
+    return BookSchema().dump(updated_book)
+
+
 def delete_book(book_id: int) -> None:
     """Delete book by its id.
     :param book_id: id of the book to delete

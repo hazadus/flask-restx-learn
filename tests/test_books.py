@@ -16,7 +16,7 @@ class TestBooksEndpoint(unittest.TestCase):
 
     def test_get_books_list(self):
         response = self.app.get(self.base_url + "/")
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(HTTPStatus.OK, response.status_code)
 
     def test_get_book(self):
         book_id = INITIAL_BOOKS[0]["id"]
@@ -27,7 +27,7 @@ class TestBooksEndpoint(unittest.TestCase):
 
     def test_delete_book(self):
         response = self.app.delete(self.base_url + "/0")
-        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+        self.assertEqual(HTTPStatus.NO_CONTENT, response.status_code)
 
     def test_post_book(self):
         """Ensure that book with existing author ID can be created."""
@@ -41,7 +41,7 @@ class TestBooksEndpoint(unittest.TestCase):
             json={"title": book_title, "author": {"id": author_id}},
         )
 
-        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(HTTPStatus.CREATED, response.status_code)
         self.assertIn(book_title, response.text)
         self.assertIn(author_last_name, response.text)
         self.assertIn(author_first_name, response.text)
@@ -54,7 +54,7 @@ class TestBooksEndpoint(unittest.TestCase):
             json={"title": "The Book", "author": {"id": wrong_author_id}},
         )
 
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
 
     def test_post_book_creates_new_author(self):
         book_id = INITIAL_BOOKS[0]["id"]
@@ -73,7 +73,7 @@ class TestBooksEndpoint(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(HTTPStatus.CREATED, response.status_code)
         self.assertIn(book_title, response.text)
         self.assertIn(author_last_name, response.text)
         self.assertIn(author_first_name, response.text)
@@ -96,4 +96,51 @@ class TestBooksEndpoint(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
+
+    def test_patch_book_updates_title(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        new_book_title = "Updated Book Title"
+
+        response = self.app.patch(
+            self.base_url + f"/{book_id}",
+            json={
+                "title": new_book_title,
+            },
+        )
+
+        self.assertEqual(HTTPStatus.OK, response.status_code)
+        self.assertIn(new_book_title, response.text)
+
+    def test_patch_book_updates_author(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        new_author_id = INITIAL_BOOKS[0]["author_id"] + 1
+
+        response = self.app.patch(
+            self.base_url + f"/{book_id}",
+            json={
+                "author": {
+                    "id": new_author_id,
+                }
+            },
+        )
+
+        self.assertEqual(HTTPStatus.OK, response.status_code)
+
+    def test_patch_book_updates_title_and_author(self):
+        book_id = INITIAL_BOOKS[0]["id"]
+        new_book_title = "Updated Book Title"
+        new_author_id = INITIAL_BOOKS[0]["author_id"] + 1
+
+        response = self.app.patch(
+            self.base_url + f"/{book_id}",
+            json={
+                "title": new_book_title,
+                "author": {
+                    "id": new_author_id,
+                },
+            },
+        )
+
+        self.assertEqual(HTTPStatus.OK, response.status_code)
+        self.assertIn(new_book_title, response.text)

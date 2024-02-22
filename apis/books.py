@@ -2,7 +2,12 @@ from http import HTTPStatus
 
 from flask_restx import Namespace, Resource
 
-from services.books import delete_book, get_all_books_json, get_book_json
+from services.books import (
+    delete_book,
+    get_all_books_json,
+    get_book_json,
+    update_book_from_payload_json,
+)
 from services.common import create_book_and_author_from_payload_json
 
 api = Namespace("books", description="Books related operations")
@@ -37,6 +42,14 @@ class Book(Resource):
             return get_book_json(book_id)
         except Exception:
             api.abort(HTTPStatus.NOT_FOUND, f"Book with {book_id=} not found.")
+
+    @api.doc("update_book")
+    def patch(self, book_id):
+        """Update book data"""
+        try:
+            return update_book_from_payload_json(book_id, api.payload)
+        except Exception as ex:
+            return api.abort(HTTPStatus.BAD_REQUEST, ex)
 
     @api.doc("delete_book")
     def delete(self, book_id):
