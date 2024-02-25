@@ -1,0 +1,32 @@
+---
+tags:
+  - books
+description: Get list of all available books.
+definitions:
+  Book:
+    type: object
+    properties:
+      id:
+        type: number
+      title:
+        type: string
+      author:
+        type: object
+        properties:
+          id:
+            type: number
+          last_name:
+            type: string
+          first_name:
+            type: string
+          middle_name:
+            type: string
+    required:
+      - title
+responses:
+  200:
+    description: List of all available books
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/Book'

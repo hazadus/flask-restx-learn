@@ -1,0 +1,61 @@
+---
+tags:
+  - books
+description: Update book data.
+definitions:
+  Book:
+    type: object
+    properties:
+      id:
+        type: number
+      title:
+        type: string
+      author:
+        type: object
+        properties:
+          id:
+            type: number
+          last_name:
+            type: string
+          first_name:
+            type: string
+          middle_name:
+            type: string
+    required:
+      - title
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error description
+parameters:
+  - name: book_id
+    in: path
+    required: true
+    type: number
+  - name: body
+    in: body
+    required: true
+    schema:
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: The book's title.
+          default: A brand new book
+        author:
+          type: object
+          properties:
+            id:
+              type: number
+responses:
+  200:
+    description: The book updated in the database
+    schema:
+      $ref: '#/definitions/Book'
+  400:
+    description: Bad request
+    schema:
+      $ref: '#/definitions/Error'

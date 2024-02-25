@@ -18,3 +18,5 @@ Repo for experiments with Flask-RESTX library.
   - Flask-RESTX
   - Marshmallow
   - SQLite3
+  - [Flasgger](https://github.com/flasgger/flasgger): API docs using external `yml` files (available at `/apidocs/` 
+    route).

@@ -18,14 +18,16 @@ api = Namespace("books", description="Books related operations")
 
 @api.route("/")
 class BookList(Resource):
-    @api.doc("list_books")
     def get(self):
-        """List all books"""
+        """
+        file: books_get_list.yml
+        """
         return get_all_books_json()
 
-    @api.doc("create_book")
     def post(self):
-        """Create new book (and author if needed), and return its data"""
+        """
+        file: books_create.yml
+        """
         try:
             return (
                 create_book_and_author_from_payload_json(api.payload),
@@ -38,26 +40,27 @@ class BookList(Resource):
 @api.route("/<book_id>")
 @api.param("book_id", "The book identifier")
 class Book(Resource):
-    @api.doc("get_book")
     def get(self, book_id):
-        """Get book by its id"""
+        """
+        file: books_get_by_id.yml
+        """
         try:
             return get_book_json(book_id)
         except Exception:
             api.abort(HTTPStatus.NOT_FOUND, f"Book with {book_id=} not found.")
 
-    @api.doc("update_book")
     def patch(self, book_id):
-        """Update book data"""
+        """
+        file: books_patch.yml
+        """
         try:
             return update_book_from_payload_json(book_id, api.payload)
         except Exception as ex:
             return api.abort(HTTPStatus.BAD_REQUEST, ex)
 
-    @api.doc("update_or_create_book")
     def put(self, book_id):
-        """Update or create the book
-        Return 200 if updated, 201 if the book was created
+        """
+        file: books_put.yml
         """
         try:
             json, status_code = update_or_create_book_from_payload_json(
@@ -67,9 +70,10 @@ class Book(Resource):
         except Exception as ex:
             return api.abort(HTTPStatus.BAD_REQUEST, ex)
 
-    @api.doc("delete_book")
     def delete(self, book_id):
-        """Delete book by its id."""
+        """
+        file: books_delete.yml
+        """
         try:
             delete_book(book_id)
             return "", HTTPStatus.NO_CONTENT

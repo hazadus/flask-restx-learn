@@ -1,0 +1,23 @@
+---
+tags:
+  - books
+description: Delete the book.
+definitions:
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error description
+parameters:
+  - name: book_id
+    in: path
+    required: true
+    type: number
+responses:
+  204:
+    description: The book was successfully deleted from the database
+  400:
+    description: Bad request
+    schema:
+      $ref: '#/definitions/Error'

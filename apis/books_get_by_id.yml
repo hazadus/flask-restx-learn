@@ -1,0 +1,43 @@
+---
+tags:
+  - books
+description: Get book data by its ID.
+definitions:
+  Book:
+    type: object
+    properties:
+      id:
+        type: number
+      title:
+        type: string
+      author:
+        type: object
+        properties:
+          id:
+            type: number
+          last_name:
+            type: string
+          first_name:
+            type: string
+          middle_name:
+            type: string
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error description
+parameters:
+  - name: book_id
+    in: path
+    required: true
+    type: number
+responses:
+  200:
+    description: Requested book data
+    schema:
+      $ref: '#/definitions/Book'
+  404:
+    description: Book not found
+    schema:
+      $ref: '#/definitions/Error'
