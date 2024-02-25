@@ -1,5 +1,5 @@
-from flask import Flask
 from flasgger import Swagger
+from flask import Flask
 
 from apis import api
 from core.database import delete_db, init_db

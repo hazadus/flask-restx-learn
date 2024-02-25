@@ -1,4 +1,4 @@
+from .author_get_by_id import authors_get_by_id_specs
+from .authors_delete import authors_delete_specs
 from .authors_get_list import authors_get_list_specs
 from .authors_post import authors_post_specs
-from .authors_delete import authors_delete_specs
-from .author_get_by_id import authors_get_by_id_specs
