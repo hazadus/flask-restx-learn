@@ -1,6 +1,6 @@
 # flask-restx-learn
 
-Repo for experiments with Flask-RESTX library.
+Repo for experiments with Flask-RESTX, Marshmallow and SQLAlchemy libraries.
 
 ## References
 
@@ -8,6 +8,7 @@ Repo for experiments with Flask-RESTX library.
 - [marshmallow docs](https://marshmallow.readthedocs.io/en/stable/)
   - [Partial loading](https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading)
   - [Handling unknown fields](https://marshmallow.readthedocs.io/en/stable/quickstart.html#handling-unknown-fields)
+- [SQLAlchemy Unified Tutorial](https://docs.sqlalchemy.org/en/20/tutorial/index.html)
 
 ## Repo Contents
 
@@ -20,3 +21,4 @@ Repo for experiments with Flask-RESTX library.
   - SQLite3
   - [Flasgger](https://github.com/flasgger/flasgger): API docs using external `yml` files (available at `/apidocs/` 
     route).
+- SQLAlchemy basic examples: [alchemy/](alchemy/)

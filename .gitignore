@@ -165,5 +165,4 @@ docker/postgres/
 misc/cats/
 
 *.bin
-
 *.db
