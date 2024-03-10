@@ -9,6 +9,7 @@ Repo for experiments with Flask-RESTX, Marshmallow and SQLAlchemy libraries.
   - [Partial loading](https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading)
   - [Handling unknown fields](https://marshmallow.readthedocs.io/en/stable/quickstart.html#handling-unknown-fields)
 - [SQLAlchemy Unified Tutorial](https://docs.sqlalchemy.org/en/20/tutorial/index.html)
+  - Up next: https://docs.sqlalchemy.org/en/20/tutorial/orm_related_objects.html
 
 ## Repo Contents
 
