@@ -8,10 +8,12 @@ from sqlalchemy import (
     DateTime,
     select,
 )
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
 
 engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
 class Base(DeclarativeBase):
@@ -62,11 +64,11 @@ class Student(Base):
         )
 
     @staticmethod
-    def all_with_scholarship(session: Session):
+    def all_with_scholarship():
         return session.execute(select(Student).filter_by(scholarship=True))
 
     @staticmethod
-    def all_with_average_more_than(session: Session, min_average: float):
+    def all_with_average_more_than(min_average: float):
         return session.execute(
             select(Student).filter(Student.average_score > min_average)
         )
@@ -107,15 +109,13 @@ def initialize_db():
         scholarship=True,
     )
 
-    with Session(engine) as session:
-        session.add_all([student1, student2])
-        session.commit()
+    session.add_all([student1, student2])
+    session.commit()
 
 
 if __name__ == "__main__":
     initialize_db()
-    with Session(engine) as session:
-        print(list(Student.all_with_scholarship(session)))
+    print(list(Student.all_with_scholarship()))
 
-        for student in Student.all_with_average_more_than(session, 4.5):
-            print(student[0].to_json())
+    for student in Student.all_with_average_more_than(4.5):
+        print(student[0].to_json())
