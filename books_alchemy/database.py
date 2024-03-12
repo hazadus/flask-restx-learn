@@ -123,6 +123,19 @@ def get_debtors() -> list[Student]:
     return students
 
 
+def give_book(student_id: int, book_id: int) -> GivenBook:
+    """
+    Выдать книгу студенту.
+    :param student_id: ID студента
+    :param book_id: ID книги
+    :return: новый инстанс GivenBook
+    """
+    gb = GivenBook(book_id=book_id, student_id=student_id, date_of_issue=datetime.now())
+    session.add(gb)
+    session.commit()
+    return gb
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 
