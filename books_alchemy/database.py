@@ -136,6 +136,21 @@ def give_book(student_id: int, book_id: int) -> GivenBook:
     return gb
 
 
+def return_book(student_id: int, book_id: int):
+    """
+    Сдать книгу в библиотеку (входные параметры ID книги и ID студента, если такой связки нет, выдать ошибку).
+    :param student_id: ID студента
+    :param book_id: ID книги
+    """
+    gb = session.execute(
+        select(GivenBook).filter_by(
+            student_id=student_id, book_id=book_id, date_of_return=None
+        )
+    ).scalar_one()
+    gb.date_of_return = datetime.now()
+    session.commit()
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 

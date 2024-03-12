@@ -1,8 +1,16 @@
 from http import HTTPStatus
 
 from flask import Flask, abort, jsonify, request
+from sqlalchemy.exc import NoResultFound
 
-from books_alchemy.database import Book, initialize_db, session, get_debtors, give_book
+from books_alchemy.database import (
+    Book,
+    initialize_db,
+    session,
+    get_debtors,
+    give_book,
+    return_book,
+)
 
 app = Flask(__name__)
 
@@ -40,7 +48,20 @@ def post_give_book():
     return gb.to_json(), HTTPStatus.CREATED
 
 
-# сдать книгу в библиотеку (POST — входные параметры ID книги и ID студента, если такой связки нет, выдать ошибку).
+@app.route("/books/return/", methods=["POST"])
+def post_return_book():
+    """
+    Сдать книгу в библиотеку (POST — входные параметры ID книги и ID студента, если такой связки нет, выдать ошибку).
+    curl -X POST -H "Content-Type: application/json" --data '{"book_id": 1, "student_id": 1}' http://127.0.0.1:5000/books/return/
+    """
+    book_id = request.json["book_id"]
+    student_id = request.json["student_id"]
+    try:
+        return_book(student_id=student_id, book_id=book_id)
+        return "", HTTPStatus.OK
+    except NoResultFound as ex:
+        return f"Error: {ex}", HTTPStatus.NOT_FOUND
+
 
 if __name__ == "__main__":
     initialize_db()
