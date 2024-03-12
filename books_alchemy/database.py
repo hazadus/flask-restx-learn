@@ -1,5 +1,5 @@
 import os.path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import (
     Boolean,
@@ -100,11 +100,27 @@ class GivenBook(Base):
         )
 
     @hybrid_property
-    def count_date_with_book(self):
+    def count_date_with_book(self) -> int:
         """Количество дней, которые читатель держит/держал книгу у себя"""
         if self.date_of_return:
             return (self.date_of_return - self.date_of_issue).days
         return (datetime.now() - self.date_of_issue).days
+
+
+def get_debtors() -> list[Student]:
+    """Получить список должников, которые держат книги у себя более 14 дней."""
+    given_books = session.execute(
+        select(GivenBook)
+        .filter_by(date_of_return=None)
+        .filter(GivenBook.date_of_issue < datetime.today() - timedelta(14))
+    )
+    students = []
+    for gb in given_books:
+        student_ = session.execute(
+            select(Student).filter_by(id=gb[0].student_id)
+        ).scalar_one()
+        students.append(student_)
+    return students
 
 
 def initialize_db():
@@ -140,8 +156,7 @@ def initialize_db():
     given_book = GivenBook(
         book_id=1,
         student_id=1,
-        date_of_issue=datetime(2024, 3, 2),
-        date_of_return=datetime(2024, 3, 10),
+        date_of_issue=datetime(2024, 2, 27),
     )
 
     session.add_all([student1, student2, author1, book1, given_book])
