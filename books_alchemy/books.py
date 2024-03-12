@@ -1,4 +1,13 @@
-from sqlalchemy import create_engine, String, Integer, Date, Float, Boolean, DateTime
+from sqlalchemy import (
+    create_engine,
+    String,
+    Integer,
+    Date,
+    Float,
+    Boolean,
+    DateTime,
+    select,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 
@@ -51,6 +60,16 @@ class Student(Base):
             f"scholarship={self.scholarship})"
         )
 
+    @staticmethod
+    def all_with_scholarship(session: Session):
+        return session.execute(select(Student).filter_by(scholarship=True))
+
+    @staticmethod
+    def all_with_average_more_than(session: Session, min_average: float):
+        return session.execute(
+            select(Student).filter(Student.average_score > min_average)
+        )
+
 
 class GivenBook(Base):
     __tablename__ = "receiving_books"
@@ -67,6 +86,33 @@ class GivenBook(Base):
         )
 
 
-if __name__ == "__main__":
-    # This will create all the tables:
+def initialize_db():
     Base.metadata.create_all(engine)
+
+    student1 = Student(
+        name="Ivan",
+        surname="Petrov",
+        phone="+79210000001",
+        email="ivan@petrov.ru",
+        average_score=4.2,
+        scholarship=False,
+    )
+    student2 = Student(
+        name="Petr",
+        surname="Ivanov",
+        phone="+79210001000",
+        email="petr@ivanov.ru",
+        average_score=5.0,
+        scholarship=True,
+    )
+
+    with Session(engine) as session:
+        session.add_all([student1, student2])
+        session.commit()
+
+
+if __name__ == "__main__":
+    initialize_db()
+    with Session(engine) as session:
+        print(list(Student.all_with_scholarship(session)))
+        print(list(Student.all_with_average_more_than(session, 4.5)))
