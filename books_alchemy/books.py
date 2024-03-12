@@ -15,7 +15,8 @@ engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
 
 class Base(DeclarativeBase):
-    pass
+    def to_json(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Book(Base):
@@ -115,4 +116,6 @@ if __name__ == "__main__":
     initialize_db()
     with Session(engine) as session:
         print(list(Student.all_with_scholarship(session)))
-        print(list(Student.all_with_average_more_than(session, 4.5)))
+
+        for student in Student.all_with_average_more_than(session, 4.5):
+            print(student[0].to_json())
