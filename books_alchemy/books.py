@@ -1,15 +1,17 @@
+from datetime import datetime
+
 from sqlalchemy import (
-    create_engine,
-    String,
-    Integer,
-    Date,
-    Float,
     Boolean,
+    Date,
     DateTime,
+    Float,
+    Integer,
+    String,
+    create_engine,
     select,
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
-
 
 engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 Session = sessionmaker(bind=engine)
@@ -80,7 +82,9 @@ class GivenBook(Base):
     book_id: Mapped[int] = mapped_column(Integer, nullable=False)
     student_id: Mapped[int] = mapped_column(Integer, nullable=False)
     date_of_issue: Mapped["DateTime"] = mapped_column(DateTime, nullable=False)
-    date_of_return: Mapped["DateTime"] = mapped_column(DateTime, nullable=True)
+    date_of_return: Mapped["DateTime"] = mapped_column(
+        DateTime, nullable=True, default=None
+    )
 
     def __repr__(self) -> str:
         return (
@@ -88,11 +92,19 @@ class GivenBook(Base):
             f"date_of_issue={self.date_of_issue}, date_of_return={self.date_of_return})"
         )
 
+    @hybrid_property
+    def count_date_with_book(self):
+        """Количество дней, которые читатель держит/держал книгу у себя"""
+        if self.date_of_return:
+            return (self.date_of_return - self.date_of_issue).days
+        return (datetime.now() - self.date_of_issue).days
+
 
 def initialize_db():
     Base.metadata.create_all(engine)
 
     student1 = Student(
+        id=1,
         name="Ivan",
         surname="Petrov",
         phone="+79210000001",
@@ -101,6 +113,7 @@ def initialize_db():
         scholarship=False,
     )
     student2 = Student(
+        id=2,
         name="Petr",
         surname="Ivanov",
         phone="+79210001000",
@@ -109,7 +122,22 @@ def initialize_db():
         scholarship=True,
     )
 
-    session.add_all([student1, student2])
+    author1 = Author(id=1, name="Luciano", surname="Ramalho")
+    book1 = Book(
+        id=1,
+        name="Fluent Python",
+        count=1,
+        release_date=datetime(2022, 3, 31),
+        author_id=1,
+    )
+    given_book = GivenBook(
+        book_id=1,
+        student_id=1,
+        date_of_issue=datetime(2024, 3, 2),
+        date_of_return=datetime(2024, 3, 10),
+    )
+
+    session.add_all([student1, student2, author1, book1, given_book])
     session.commit()
 
 
