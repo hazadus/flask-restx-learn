@@ -1,3 +1,4 @@
+import os.path
 from datetime import datetime
 
 from sqlalchemy import (
@@ -13,7 +14,13 @@ from sqlalchemy import (
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
-engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+# For in-memory database, use this config:
+# engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+
+DB_FILENAME = "books.db"
+if os.path.exists(DB_FILENAME):
+    os.remove(DB_FILENAME)
+engine = create_engine(f"sqlite:///{DB_FILENAME}", echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 
