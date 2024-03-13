@@ -10,9 +10,17 @@ from sqlalchemy import (
     String,
     create_engine,
     select,
+    ForeignKey,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    sessionmaker,
+    relationship,
+    backref,
+)
 
 # For in-memory database, use this config:
 # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
@@ -36,7 +44,13 @@ class Book(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     count: Mapped[int] = mapped_column(Integer, default=1)
     release_date: Mapped["Date"] = mapped_column(Date, nullable=False)
-    author_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    author_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("authors.id"), nullable=False
+    )
+    author = relationship(
+        "Author", backref=backref("books", cascade="all, delete-orphan", lazy="select")
+    )
+    students = relationship("GivenBook", back_populates="book")
 
     def __repr__(self) -> str:
         return (
@@ -65,6 +79,8 @@ class Student(Base):
     average_score: Mapped["Float"] = mapped_column(Float, nullable=False)
     scholarship: Mapped["Boolean"] = mapped_column(Boolean, nullable=False)
 
+    books = relationship("GivenBook", back_populates="student")
+
     def __repr__(self) -> str:
         return (
             f"Student(id={self.id}, name={self.name}, surname={self.surname}, "
@@ -85,13 +101,19 @@ class Student(Base):
 
 class GivenBook(Base):
     __tablename__ = "receiving_books"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    book_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    student_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    book_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("books.id"), primary_key=True
+    )
+    student_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("students.id"), primary_key=True
+    )
     date_of_issue: Mapped["DateTime"] = mapped_column(DateTime, nullable=False)
     date_of_return: Mapped["DateTime"] = mapped_column(
         DateTime, nullable=True, default=None
     )
+
+    student = relationship("Student", back_populates="books")
+    book = relationship("Book", back_populates="students")
 
     def __repr__(self) -> str:
         return (
