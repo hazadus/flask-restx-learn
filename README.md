@@ -1,6 +1,6 @@
 # flask-restx-learn
 
-Repo for experiments with Flask-RESTX, Marshmallow and SQLAlchemy libraries.
+Repo for experiments with Flask, Flask-RESTX, Marshmallow and SQLAlchemy frameworks.
 
 ## References
 
@@ -23,3 +23,4 @@ Repo for experiments with Flask-RESTX, Marshmallow and SQLAlchemy libraries.
   - [Flasgger](https://github.com/flasgger/flasgger): API docs using external `yml` files (available at `/apidocs/` 
     route).
 - SQLAlchemy basic examples: [alchemy/](alchemy/)
+- SQLAlchemy + basic Flask CRUD API: [books_alchemy/](books_alchemy/)

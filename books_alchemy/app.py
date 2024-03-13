@@ -17,9 +17,16 @@ app = Flask(__name__)
 
 @app.route("/books/", methods=["GET"])
 def get_all_books():
-    """Получить все книги в библиотеке (GET)"""
+    """Получить все книги в библиотеке (GET)
+    С параметром `?name=...` возвращает список книг, в названии которых содержится значение `name`.
+    """
+    if name := request.args.get("name", None):
+        book_results = session.query(Book).filter(Book.name.ilike(f"%{name}%"))
+    else:
+        book_results = session.query(Book).all()
+
     books = []
-    for book in session.query(Book).all():
+    for book in book_results:
         books.append(book.to_json())
     return jsonify(books), HTTPStatus.OK
 
