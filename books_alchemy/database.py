@@ -173,6 +173,13 @@ def return_book(student_id: int, book_id: int):
     session.commit()
 
 
+def get_remaining_authors_books(author_id: int):
+    """Количество оставшихся в библиотеке книг по автору (входной параметр — ID автора)."""
+    return (
+        session.query(Book).filter_by(author_id=author_id).filter(Book.count > 0).all()
+    )
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 
@@ -197,21 +204,27 @@ def initialize_db():
 
     author1 = Author(name="Luciano", surname="Ramalho")
     book1 = Book(
-        name="Fluent Python",
+        name="Fluent Python (2nd edition)",
         count=10,
         release_date=datetime(2022, 3, 31),
     )
+    book2 = Book(
+        name="Fluent Python (First edition)",
+        count=0,
+        release_date=datetime(2018, 1, 1),
+    )
     author1.books.append(book1)
+    author1.books.append(book2)
 
     author2 = Author(name="Brandon", surname="Rhodes")
-    book2 = Book(
+    book3 = Book(
         name="Foundations of Python Network Programming",
         count=10,
         release_date=datetime(2014, 3, 2),
     )
-    author2.books.append(book2)
+    author2.books.append(book3)
 
-    session.add_all([student1, student2, author1, book1, author2])
+    session.add_all([student1, student2, author1, author2])
     session.flush()
 
     given_book = GivenBook(
@@ -229,3 +242,6 @@ if __name__ == "__main__":
 
     for student in Student.all_with_average_more_than(4.5):
         print(student[0].to_json())
+
+    for book in get_remaining_authors_books(author_id=1):
+        print(book)

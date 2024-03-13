@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import Flask, abort, jsonify, request
+from flask import Flask, jsonify, request
 from sqlalchemy.exc import NoResultFound
 
 from books_alchemy.database import (
@@ -10,6 +10,7 @@ from books_alchemy.database import (
     get_debtors,
     give_book,
     return_book,
+    get_remaining_authors_books,
 )
 
 app = Flask(__name__)
@@ -19,9 +20,16 @@ app = Flask(__name__)
 def get_all_books():
     """Получить все книги в библиотеке (GET)
     С параметром `?name=...` возвращает список книг, в названии которых содержится значение `name`.
+    С параметром `?author_id=...` возвращает список книг автора, которые есть в наличии.
+
+    Examples:
+        curl -X GET 'http://127.0.0.1:5000/books/?name=fluent'
+        curl -X GET 'http://127.0.0.1:5000/books/?author_id=1'
     """
     if name := request.args.get("name", None):
         book_results = session.query(Book).filter(Book.name.ilike(f"%{name}%"))
+    elif author_id := request.args.get("author_id", None):
+        book_results = get_remaining_authors_books(author_id=int(author_id))
     else:
         book_results = session.query(Book).all()
 
