@@ -195,21 +195,31 @@ def initialize_db():
         scholarship=True,
     )
 
-    author1 = Author(id=1, name="Luciano", surname="Ramalho")
+    author1 = Author(name="Luciano", surname="Ramalho")
     book1 = Book(
-        id=1,
         name="Fluent Python",
-        count=1,
+        count=10,
         release_date=datetime(2022, 3, 31),
-        author_id=1,
     )
+    author1.books.append(book1)
+
+    author2 = Author(name="Brandon", surname="Rhodes")
+    book2 = Book(
+        name="Foundations of Python Network Programming",
+        count=10,
+        release_date=datetime(2014, 3, 2),
+    )
+    author2.books.append(book2)
+
+    session.add_all([student1, student2, author1, book1, author2])
+    session.flush()
+
     given_book = GivenBook(
-        book_id=1,
-        student_id=1,
+        book_id=book1.id,
+        student_id=student1.id,
         date_of_issue=datetime(2024, 2, 27),
     )
-
-    session.add_all([student1, student2, author1, book1, given_book])
+    session.add(given_book)
     session.commit()
 
 
