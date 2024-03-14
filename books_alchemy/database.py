@@ -10,6 +10,7 @@ from sqlalchemy import (
     Integer,
     String,
     create_engine,
+    extract,
     select,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -188,6 +189,19 @@ def get_remaining_authors_books(author_id: int):
     )
 
 
+def get_average_books_given_this_month() -> float:
+    """Получить среднее количество книг, которые студенты брали в этом месяце."""
+    students_qty = session.query(Student).count()
+    # Count books given this month
+    given_book_count = (
+        session.query(GivenBook)
+        .filter(extract("year", GivenBook.date_of_issue) == datetime.now().year)
+        .filter(extract("month", GivenBook.date_of_issue) == datetime.now().month)
+        .count()
+    )
+    return given_book_count / students_qty
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 
@@ -238,7 +252,7 @@ def initialize_db():
     given_book = GivenBook(
         book_id=book1.id,
         student_id=student1.id,
-        date_of_issue=datetime(2024, 2, 27),
+        date_of_issue=datetime(2024, 3, 1),
     )
     session.add(given_book)
     session.commit()

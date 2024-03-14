@@ -5,6 +5,7 @@ from sqlalchemy.exc import NoResultFound
 
 from books_alchemy.database import (
     get_all_books,
+    get_average_books_given_this_month,
     get_books_by_name,
     get_debtors,
     get_remaining_authors_books,
@@ -37,6 +38,15 @@ def get_all_books_route():
     for book in book_results:
         books.append(book.to_json())
     return jsonify(books), HTTPStatus.OK
+
+
+@app.route("/books/average/", methods=["GET"])
+def get_books_average():
+    """Получить среднее количество книг, которые студенты брали в этом месяце."""
+    result = {
+        "average_books_given": get_average_books_given_this_month(),
+    }
+    return result, HTTPStatus.OK
 
 
 @app.route("/debtors/", methods=["GET"])
