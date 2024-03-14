@@ -6,20 +6,20 @@ from sqlalchemy import (
     Date,
     DateTime,
     Float,
+    ForeignKey,
     Integer,
     String,
     create_engine,
     select,
-    ForeignKey,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
-    mapped_column,
-    sessionmaker,
-    relationship,
     backref,
+    mapped_column,
+    relationship,
+    sessionmaker,
 )
 
 # For in-memory database, use this config:
@@ -127,6 +127,14 @@ class GivenBook(Base):
         if self.date_of_return:
             return (self.date_of_return - self.date_of_issue).days
         return (datetime.now() - self.date_of_issue).days
+
+
+def get_all_books():
+    return session.query(Book).all()
+
+
+def get_books_by_name(name: str):
+    return session.query(Book).filter(Book.name.ilike(f"%{name}%"))
 
 
 def get_debtors() -> list[Student]:

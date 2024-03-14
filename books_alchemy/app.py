@@ -4,20 +4,20 @@ from flask import Flask, jsonify, request
 from sqlalchemy.exc import NoResultFound
 
 from books_alchemy.database import (
-    Book,
-    initialize_db,
-    session,
+    get_all_books,
+    get_books_by_name,
     get_debtors,
-    give_book,
-    return_book,
     get_remaining_authors_books,
+    give_book,
+    initialize_db,
+    return_book,
 )
 
 app = Flask(__name__)
 
 
 @app.route("/books/", methods=["GET"])
-def get_all_books():
+def get_all_books_route():
     """Получить все книги в библиотеке (GET)
     С параметром `?name=...` возвращает список книг, в названии которых содержится значение `name`.
     С параметром `?author_id=...` возвращает список книг автора, которые есть в наличии.
@@ -27,11 +27,11 @@ def get_all_books():
         curl -X GET 'http://127.0.0.1:5000/books/?author_id=1'
     """
     if name := request.args.get("name", None):
-        book_results = session.query(Book).filter(Book.name.ilike(f"%{name}%"))
+        book_results = get_books_by_name(name=name)
     elif author_id := request.args.get("author_id", None):
         book_results = get_remaining_authors_books(author_id=int(author_id))
     else:
-        book_results = session.query(Book).all()
+        book_results = get_all_books()
 
     books = []
     for book in book_results:
