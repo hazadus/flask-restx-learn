@@ -1,4 +1,5 @@
 import os.path
+import re
 from datetime import datetime, timedelta
 from typing import Tuple
 
@@ -11,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     create_engine,
+    event,
     extract,
     func,
     select,
@@ -267,7 +269,7 @@ def initialize_db():
         id=1,
         name="Ivan",
         surname="Petrov",
-        phone="+79210000001",
+        phone="+7(921)000-00-01",
         email="ivan@petrov.ru",
         average_score=4.2,
         scholarship=False,
@@ -276,7 +278,7 @@ def initialize_db():
         id=2,
         name="Petr",
         surname="Ivanov",
-        phone="+79210001000",
+        phone="+7(921)000-10-00",
         email="petr@ivanov.ru",
         average_score=5.0,
         scholarship=True,
@@ -348,6 +350,13 @@ def initialize_db():
     session.add_all([given_book1, given_book2, given_book3, given_book4])
     session.commit()
 
+
+def before_insert_student_listener(mapper, connection, target: Student):
+    if not re.search(r"^\+7\(9\d\d\)\d\d\d-\d\d-\d\d$", target.phone):
+        raise ValueError(f"Wrong phone format: {target.phone}")
+
+
+event.listen(Student, "before_insert", before_insert_student_listener)
 
 if __name__ == "__main__":
     initialize_db()
