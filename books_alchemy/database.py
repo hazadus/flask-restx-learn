@@ -1,3 +1,4 @@
+import csv
 import os.path
 import re
 from datetime import datetime, timedelta
@@ -26,6 +27,7 @@ from sqlalchemy.orm import (
     relationship,
     sessionmaker,
 )
+from io import StringIO
 
 # For in-memory database, use this config:
 # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
@@ -262,6 +264,28 @@ def get_unread_books(student_id: int) -> list:
     return books
 
 
+def bulk_add_students_from_csv(csv_data: str) -> None:
+    """
+    Осуществляет массовое добавление студентов из строки в формате CSV.
+    :param csv_data: строка в формате CSV с разделителем ;.
+    """
+    mappings = []
+    for row in csv.reader(StringIO(csv_data), delimiter=";"):
+        if len(row) == 6:
+            mappings.append(
+                {
+                    "name": row[0],
+                    "surname": row[1],
+                    "phone": row[2],
+                    "email": row[3],
+                    "average_score": float(row[4]),
+                    "scholarship": bool(row[5]),
+                }
+            )
+    session.bulk_insert_mappings(Student, mappings)
+    session.commit()
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 
@@ -374,3 +398,11 @@ if __name__ == "__main__":
 
     for book in get_unread_books(student_id=2):
         print(book)
+
+    csv_data = """Иван;Сидоров;+7(921)123-45-67;ivan@sidorov.ru;3.9;0
+Петр;Иванов;+7(921)321-54-76;petr@ivanov.ru;3.8;0
+Евгений;Бучий;+7(921)003-05-07;eugene@buchi.ru;3.7;0
+"""
+    bulk_add_students_from_csv(csv_data)
+    for s in session.query(Student).all():
+        print(s)

@@ -15,6 +15,7 @@ from books_alchemy.database import (
     give_book,
     initialize_db,
     return_book,
+    bulk_add_students_from_csv,
 )
 
 app = Flask(__name__)
@@ -133,6 +134,24 @@ def get_remaining_authors_books_count(author_id):
         "remaining_books_count": books_count,
     }
     return result, HTTPStatus.OK
+
+
+@app.route("/students/csv/", methods=["POST"])
+def bulk_add_students_route():
+    """
+    Осуществляет массовое добавление студентов из CSV файла.
+    Файл должен загружаться как multipart/form-data.
+
+    Пример использования:
+        curl -F file=@./students.csv http://127.0.0.1:5000/students/csv/
+    """
+    if "file" not in request.files:
+        return {"message": "Error: no file uploaded."}, HTTPStatus.BAD_REQUEST
+
+    file = request.files["file"]
+    csv_data = file.stream.read().decode("utf-8")
+    bulk_add_students_from_csv(csv_data)
+    return "OK", HTTPStatus.CREATED
 
 
 if __name__ == "__main__":
