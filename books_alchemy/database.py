@@ -279,7 +279,25 @@ def initialize_db():
     )
     author2.books.append(book3)
 
-    session.add_all([student1, student2, author1, author2])
+    author3 = Author(name="Robert", surname="Martin")
+    author3.books.append(
+        Book(name="Clean Code", count=6, release_date=datetime(2008, 8, 1))
+    )
+    author3.books.append(
+        Book(name="The Clean Coder", count=3, release_date=datetime(2017, 9, 1))
+    )
+    author3.books.append(
+        Book(name="Clean Architecture", count=7, release_date=datetime(2017, 9, 1))
+    )
+    author3.books.append(
+        Book(
+            name="Clean Agile: Back to Basics",
+            count=4,
+            release_date=datetime(2019, 10, 1),
+        )
+    )
+
+    session.add_all([student1, student2, author1, author2, author3])
     session.flush()
 
     given_book1 = GivenBook(
@@ -297,7 +315,12 @@ def initialize_db():
         student_id=student2.id,
         date_of_issue=datetime(2024, 3, 10),
     )
-    session.add_all([given_book1, given_book2, given_book3])
+    given_book4 = GivenBook(
+        book_id=4,
+        student_id=student2.id,
+        date_of_issue=datetime(2024, 1, 12),
+    )
+    session.add_all([given_book1, given_book2, given_book3, given_book4])
     session.commit()
 
 
