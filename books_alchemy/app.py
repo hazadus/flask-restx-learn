@@ -11,6 +11,7 @@ from books_alchemy.database import (
     get_most_popular_book,
     get_remaining_authors_books,
     get_top10_readers,
+    get_unread_books,
     give_book,
     initialize_db,
     return_book,
@@ -82,6 +83,18 @@ def get_most_popular_book_route():
     """
     book = get_most_popular_book()
     return book.to_json(), HTTPStatus.OK
+
+
+@app.route("/books/unread/<student_id>/", methods=["GET"])
+def get_unread_books_route(student_id):
+    """
+    Получить список книг, которые студент не читал, при этом другие книги этого автора студент уже брал.
+    curl -X GET http://127.0.0.1:5000/books/unread/2/
+    """
+    result = []
+    for book in get_unread_books(student_id=student_id):
+        result.append(book.to_json())
+    return result, HTTPStatus.OK
 
 
 @app.route("/debtors/", methods=["GET"])

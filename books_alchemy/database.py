@@ -235,6 +235,31 @@ def get_most_popular_book() -> Book:
     return row[0]
 
 
+def get_unread_books(student_id: int) -> list:
+    """Получить список книг, которые студент не читал, при этом другие книги этого автора студент уже брал."""
+    # Подзапрос: авторы которых брал студент
+    taken_authors_query = (
+        session.query(Author.id)
+        .outerjoin(Book)
+        .outerjoin(GivenBook)
+        .filter(GivenBook.student_id == student_id)
+        .subquery()
+    )
+    taken_books_query = (
+        session.query(GivenBook.book_id)
+        .filter(GivenBook.student_id == student_id)
+        .subquery()
+    )
+    # Запрос: книги которые студент не брал, но с авторами, которых брал
+    books = (
+        session.query(Book)
+        .filter(Book.author_id.in_(taken_authors_query))
+        .filter(Book.id.not_in(taken_books_query))
+        .all()
+    )
+    return books
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 
@@ -337,3 +362,6 @@ if __name__ == "__main__":
     print(get_remaining_authors_books(author_id=1))
 
     print(get_most_popular_book())
+
+    for book in get_unread_books(student_id=2):
+        print(book)
