@@ -12,6 +12,7 @@ from books_alchemy.database import (
     give_book,
     initialize_db,
     return_book,
+    get_top10_readers,
 )
 
 app = Flask(__name__)
@@ -21,16 +22,12 @@ app = Flask(__name__)
 def get_all_books_route():
     """Получить все книги в библиотеке (GET)
     С параметром `?name=...` возвращает список книг, в названии которых содержится значение `name`.
-    С параметром `?author_id=...` возвращает список книг автора, которые есть в наличии.
 
     Examples:
         curl -X GET 'http://127.0.0.1:5000/books/?name=fluent'
-        curl -X GET 'http://127.0.0.1:5000/books/?author_id=1'
     """
     if name := request.args.get("name", None):
         book_results = get_books_by_name(name=name)
-    elif author_id := request.args.get("author_id", None):
-        book_results = get_remaining_authors_books(author_id=int(author_id))
     else:
         book_results = get_all_books()
 
@@ -38,27 +35,6 @@ def get_all_books_route():
     for book in book_results:
         books.append(book.to_json())
     return jsonify(books), HTTPStatus.OK
-
-
-@app.route("/books/average/", methods=["GET"])
-def get_books_average():
-    """Получить среднее количество книг, которые студенты брали в этом месяце."""
-    result = {
-        "average_books_given": get_average_books_given_this_month(),
-    }
-    return result, HTTPStatus.OK
-
-
-@app.route("/debtors/", methods=["GET"])
-def get_debtors_list():
-    """
-    Получить список должников, которые держат книги у себя более 14 дней (GET).
-    curl -X GET http://127.0.0.1:5000/debtors/
-    """
-    debtors = []
-    for student in get_debtors():
-        debtors.append(student.to_json())
-    return jsonify(debtors), HTTPStatus.OK
 
 
 @app.route("/books/", methods=["POST"])
@@ -86,6 +62,53 @@ def post_return_book():
         return "", HTTPStatus.OK
     except NoResultFound as ex:
         return f"Error: {ex}", HTTPStatus.NOT_FOUND
+
+
+@app.route("/books/average/", methods=["GET"])
+def get_books_average():
+    """Получить среднее количество книг, которые студенты брали в этом месяце."""
+    result = {
+        "average_books_given": get_average_books_given_this_month(),
+    }
+    return result, HTTPStatus.OK
+
+
+@app.route("/debtors/", methods=["GET"])
+def get_debtors_list():
+    """
+    Получить список должников, которые держат книги у себя более 14 дней (GET).
+    curl -X GET http://127.0.0.1:5000/debtors/
+    """
+    debtors = []
+    for student in get_debtors():
+        debtors.append(student.to_json())
+    return jsonify(debtors), HTTPStatus.OK
+
+
+@app.route("/top10/", methods=["GET"])
+def get_top10():
+    """
+    Получить ТОП-10 самых читающих студентов в этом году.
+    curl -X GET http://127.0.0.1:5000/top10/
+    """
+    readers = []
+    for row in get_top10_readers():
+        readers.append(row[0].to_json())
+    return jsonify(readers), HTTPStatus.OK
+
+
+@app.route("/author/<author_id>/", methods=["GET"])
+def get_remaining_authors_books_count(author_id):
+    """
+    Количество оставшихся в библиотеке книг по автору (входной параметр — ID автора)
+    curl -X GET http://127.0.0.1:5000/author/1/
+    """
+    books_count = get_remaining_authors_books(author_id)
+    result = {
+        "author_id": author_id,
+        "remaining_books_count": books_count,
+    }
+    return result, HTTPStatus.OK
 
 
 if __name__ == "__main__":

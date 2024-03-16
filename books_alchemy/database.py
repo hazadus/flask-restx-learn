@@ -1,5 +1,6 @@
 import os.path
 from datetime import datetime, timedelta
+from typing import Tuple
 
 from sqlalchemy import (
     Boolean,
@@ -12,6 +13,7 @@ from sqlalchemy import (
     create_engine,
     extract,
     select,
+    func,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
@@ -182,11 +184,9 @@ def return_book(student_id: int, book_id: int):
     session.commit()
 
 
-def get_remaining_authors_books(author_id: int):
+def get_remaining_authors_books(author_id: int) -> int:
     """Количество оставшихся в библиотеке книг по автору (входной параметр — ID автора)."""
-    return (
-        session.query(Book).filter_by(author_id=author_id).filter(Book.count > 0).all()
-    )
+    return session.query(func.sum(Book.count)).filter_by(author_id=author_id).scalar()
 
 
 def get_average_books_given_this_month() -> float:
@@ -200,6 +200,21 @@ def get_average_books_given_this_month() -> float:
         .count()
     )
     return given_book_count / students_qty
+
+
+def get_top10_readers() -> list[Tuple[Student, int]]:
+    """Получите ТОП-10 самых читающих студентов в этом году.
+    :return: Список кортежей вида (студент, кол-во прочитанных книг) за текущий год, по убыванию
+    количества прочитанных книг.
+    """
+    return (
+        session.query(Student, func.count(GivenBook.book_id))
+        .filter(extract("year", GivenBook.date_of_issue) == datetime.now().year)
+        .outerjoin(GivenBook)
+        .group_by(Student.id)
+        .order_by(func.count(GivenBook.book_id).desc())
+        .limit(10)
+    )
 
 
 def initialize_db():
@@ -232,7 +247,7 @@ def initialize_db():
     )
     book2 = Book(
         name="Fluent Python (First edition)",
-        count=0,
+        count=2,
         release_date=datetime(2018, 1, 1),
     )
     author1.books.append(book1)
@@ -249,12 +264,22 @@ def initialize_db():
     session.add_all([student1, student2, author1, author2])
     session.flush()
 
-    given_book = GivenBook(
+    given_book1 = GivenBook(
         book_id=book1.id,
+        student_id=student1.id,
+        date_of_issue=datetime(2024, 2, 1),
+    )
+    given_book2 = GivenBook(
+        book_id=book3.id,
         student_id=student1.id,
         date_of_issue=datetime(2024, 3, 1),
     )
-    session.add(given_book)
+    given_book3 = GivenBook(
+        book_id=book1.id,
+        student_id=student2.id,
+        date_of_issue=datetime(2024, 3, 10),
+    )
+    session.add_all([given_book1, given_book2, given_book3])
     session.commit()
 
 
@@ -265,5 +290,7 @@ if __name__ == "__main__":
     for student in Student.all_with_average_more_than(4.5):
         print(student[0].to_json())
 
-    for book in get_remaining_authors_books(author_id=1):
-        print(book)
+    for row in get_top10_readers():
+        print(row)
+
+    print(get_remaining_authors_books(author_id=1))
