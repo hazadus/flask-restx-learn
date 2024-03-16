@@ -8,11 +8,12 @@ from books_alchemy.database import (
     get_average_books_given_this_month,
     get_books_by_name,
     get_debtors,
+    get_most_popular_book,
     get_remaining_authors_books,
+    get_top10_readers,
     give_book,
     initialize_db,
     return_book,
-    get_top10_readers,
 )
 
 app = Flask(__name__)
@@ -71,6 +72,16 @@ def get_books_average():
         "average_books_given": get_average_books_given_this_month(),
     }
     return result, HTTPStatus.OK
+
+
+@app.route("/books/most_popular/", methods=["GET"])
+def get_most_popular_book_route():
+    """
+    Получить самую популярную книгу среди студентов, у которых средний балл больше 4.0.
+    curl -X GET http://127.0.0.1:5000/books/most_popular/
+    """
+    book = get_most_popular_book()
+    return book.to_json(), HTTPStatus.OK
 
 
 @app.route("/debtors/", methods=["GET"])

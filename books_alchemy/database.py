@@ -12,8 +12,8 @@ from sqlalchemy import (
     String,
     create_engine,
     extract,
-    select,
     func,
+    select,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
@@ -217,6 +217,24 @@ def get_top10_readers() -> list[Tuple[Student, int]]:
     )
 
 
+def get_most_popular_book() -> Book:
+    """
+    Получить самую популярную книгу среди студентов, у которых средний балл больше 4.0.
+    :return: инстанс книги, которую больше всего брали студенты со средним баллом >4.
+    """
+    row = (
+        session.query(Book, func.count(GivenBook.book_id))
+        .outerjoin(GivenBook)
+        .outerjoin(Student)
+        .group_by(GivenBook.book_id)
+        .filter(Student.average_score > 4)
+        .order_by(func.count(GivenBook.book_id).desc())
+        .first()
+    )
+    # row will contain (Book, count,) tuple:
+    return row[0]
+
+
 def initialize_db():
     Base.metadata.create_all(engine)
 
@@ -294,3 +312,5 @@ if __name__ == "__main__":
         print(row)
 
     print(get_remaining_authors_books(author_id=1))
+
+    print(get_most_popular_book())

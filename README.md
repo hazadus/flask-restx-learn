@@ -1,6 +1,6 @@
 # flask-restx-learn
 
-Repo for experiments with Flask, Flask-RESTX, Marshmallow and SQLAlchemy frameworks.
+Repo for experiments with Flask, oFlask-RESTX, Marshmallow and SQLAlchemy frameworks.
 
 ## References
 
@@ -9,7 +9,9 @@ Repo for experiments with Flask, Flask-RESTX, Marshmallow and SQLAlchemy framewo
   - [Partial loading](https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading)
   - [Handling unknown fields](https://marshmallow.readthedocs.io/en/stable/quickstart.html#handling-unknown-fields)
 - [SQLAlchemy Unified Tutorial](https://docs.sqlalchemy.org/en/20/tutorial/index.html)
-  - Up next: https://docs.sqlalchemy.org/en/20/tutorial/orm_related_objects.html
+  - [Relationship Loading Techniques](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html)
+  - [Association Proxy](https://docs.sqlalchemy.org/en/20/orm/extensions/associationproxy.html)
+  - [ORM Events](https://docs.sqlalchemy.org/en/14/orm/events.html)
 
 ## Repo Contents
 
