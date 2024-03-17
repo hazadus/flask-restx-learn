@@ -1,6 +1,6 @@
 # flask-restx-learn
 
-Repo for experiments with Flask, oFlask-RESTX, Marshmallow and SQLAlchemy frameworks.
+Repo for experiments with Flask, Flask-RESTX, Marshmallow, SQLAlchemy and Celery.
 
 ## References
 
@@ -26,3 +26,4 @@ Repo for experiments with Flask, oFlask-RESTX, Marshmallow and SQLAlchemy framew
     route).
 - SQLAlchemy basic examples: [alchemy/](alchemy/)
 - SQLAlchemy + basic Flask CRUD API: [books_alchemy/](books_alchemy/)
+- Flask API + Celery: [image_service/](image_service/)
